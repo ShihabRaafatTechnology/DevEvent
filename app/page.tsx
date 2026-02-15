@@ -7,7 +7,7 @@ const page = () => {
     <section>
       <h1 className="text-center my-5">
         The Hub for Every Dev <br />
-        Event You Can't Miss
+        Event You Can&apos;t Miss
       </h1>
       <p className="text-center text-sm lg:text-base">
         Hackathons, Meetups, and Conferences, All in One Place
