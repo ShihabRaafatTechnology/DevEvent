@@ -9,7 +9,7 @@ type MongooseCache = {
 // Extend the global object to include our mongoose cache
 declare global {
   // eslint-disable-next-line no-var
-  var mongoose: MongooseCache | undefined;
+  var mongooseCache: MongooseCache | undefined;
 }
 
 // Get MongoDB URI from environment variables
@@ -25,10 +25,10 @@ if (!MONGODB_URI) {
 // Initialize the cached connection object
 // In development, use a global variable to preserve the connection across hot reloads
 // In production, create a new cache object for each serverless function invocation
-const cached: MongooseCache = global.mongoose || { conn: null, promise: null };
+const cached: MongooseCache = global.mongooseCache || { conn: null, promise: null };
 
-if (!global.mongoose) {
-  global.mongoose = cached;
+if (!global.mongooseCache) {
+  global.mongooseCache = cached;
 }
 
 /**
