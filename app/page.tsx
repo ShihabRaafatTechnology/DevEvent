@@ -1,11 +1,17 @@
 import EventCard from "@/components/EventCard";
 import ExploreBtn from "@/components/ExploreBtn";
-import { IEvent } from "@/database";
+import type { IEvent } from "@/database";
 
 const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL;
 
 const page = async() => {
+  if (!BASE_URL) {
+    throw new Error("NEXT_PUBLIC_BASE_URL is not set");
+  }
   const res = await fetch(`${BASE_URL}/api/events`);
+  if (!res.ok) {
+    throw new Error(`Failed to fetch events: ${res.status} ${res.statusText}`);
+  }
   const { events } = await res.json();
   
   return (
@@ -23,7 +29,7 @@ const page = async() => {
         <h3>Featured Events</h3>
         <ul className="events">
           {events && events.length > 0 && events.map((event: IEvent) => (
-            <li key={event.title}>
+<li key={event.slug ?? `event-${event._id}`}>
               <EventCard {...event} />
             </li>
           ))}
