@@ -20,6 +20,26 @@ export interface IEvent extends Document {
   updatedAt: Date;
 }
 
+export type EventClient = {
+  _id: string;
+  title: string;
+  slug: string;
+  description: string;
+  overview: string;
+  image: string;
+  venue: string;
+  location: string;
+  date: string;
+  time: string;
+  mode: string;
+  audience: string;
+  agenda: string[];
+  organizer: string;
+  tags: string[];
+  createdAt: string;
+  updatedAt: string;
+};
+
 // Event schema definition
 const EventSchema = new Schema<IEvent>(
   {
@@ -122,7 +142,7 @@ EventSchema.pre('save', function (this: IEvent) {
   }
 
   if (this.isModified('date')) {
-    const dateRegex = /^(\\d{4})-(\\d{2})-(\\d{2})$/;
+    const dateRegex = /^(\d{4})-(\d{2})-(\d{2})$/;
     const match = dateRegex.exec(this.date.trim());
 
     if (!match) {

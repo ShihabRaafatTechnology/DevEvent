@@ -7,6 +7,26 @@ import { notFound } from "next/navigation";
 
 const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL;
 
+export type EventClient = {
+  _id: string;
+  title: string;
+  slug: string;
+  description: string;
+  overview: string;
+  image: string;
+  venue: string;
+  location: string;
+  date: string;
+  time: string;
+  mode: string;
+  audience: string;
+  agenda: string[];
+  organizer: string;
+  tags: string[];
+  createdAt: string;
+  updatedAt: string;
+};
+
 const EventDetailItem = ({
   icon,
   alt,
@@ -70,7 +90,7 @@ const EventDetailsPage = async ({
 
   const bookings = 10;
 
-  const similarEvents: IEvent[] = await getSimilarEventsBySlug(slug);
+  const similarEvents: EventClient[] = await getSimilarEventsBySlug(slug);
   console.log("Similar Events:", similarEvents);
 
   return (
@@ -153,9 +173,11 @@ const EventDetailsPage = async ({
       </div>
 
       <div className="flex w-full flex-col gap-4 pt-20">
-                <h2>Similar Events</h2>
+                {similarEvents.length > 0 && (
+                  <h2>Similar Events</h2>
+                )}
                 <div className="events">
-                    {similarEvents.length > 0 && similarEvents.map((similarEvent: IEvent) => (
+                    {similarEvents.length > 0 && similarEvents.map((similarEvent: EventClient) => (
                         <EventCard key={similarEvent.slug} {...similarEvent} />
                     ))}
                 </div>
