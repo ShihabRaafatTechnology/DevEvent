@@ -60,10 +60,12 @@ const EventSchema = new Schema<IEvent>(
     date: {
       type: String,
       required: [true, 'Date is required'],
+      trim: true,
     },
     time: {
       type: String,
       required: [true, 'Time is required'],
+      trim: true,
     },
     mode: {
       type: String,
@@ -120,27 +122,27 @@ EventSchema.pre('save', function (this: IEvent) {
   }
 
   if (this.isModified('date')) {
-    const dateRegex = /^(\\\\d{4})-(\\\\d{2})-(\\\\d{2})$/;
-    const match = dateRegex.exec(this.date);
-    
+    const dateRegex = /^(\\d{4})-(\\d{2})-(\\d{2})$/;
+    const match = dateRegex.exec(this.date.trim());
+
     if (!match) {
       throw new Error('Invalid date format');
     }
-    
+
     const [, yearStr, monthStr, dayStr] = match;
     const year = parseInt(yearStr, 10);
     const month = parseInt(monthStr, 10);
     const day = parseInt(dayStr, 10);
-    
+
     const dateObj = new Date(year, month - 1, day);
-    
+
     if (isNaN(dateObj.getTime()) ||
-        dateObj.getFullYear() !== year ||
-        dateObj.getMonth() + 1 !== month ||
-        dateObj.getDate() !== day) {
+      dateObj.getFullYear() !== year ||
+      dateObj.getMonth() + 1 !== month ||
+      dateObj.getDate() !== day) {
       throw new Error('Invalid date format');
     }
-    
+
     this.date = dateObj.toISOString().split('T')[0];
   }
 
