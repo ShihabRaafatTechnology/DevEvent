@@ -46,7 +46,9 @@ async function connectDB(): Promise<typeof mongoose> {
   // Return existing connection promise if one is in progress
   if (!cached.promise) {
     const options = {
-      bufferCommands: false, // Disable buffering to immediately throw errors if not connected
+      bufferCommands: false,
+      serverSelectionTimeoutMS: 5000, // ⬅️ VERY IMPORTANT
+      socketTimeoutMS: 45000,
     };
 
     // Create a new connection promise
