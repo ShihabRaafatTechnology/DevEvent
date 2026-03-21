@@ -1,11 +1,11 @@
 import BookEvent from "@/components/BookEvent";
 import EventCard from "@/components/EventCard";
-import { IEvent } from "@/database";
-import { getSimilarEventsBySlug } from "@/lib/actions/event.actions";
+import {
+  getEventBySlug,
+  getSimilarEventsBySlug,
+} from "@/lib/actions/event.actions";
 import Image from "next/image";
 import { notFound } from "next/navigation";
-
-const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL;
 
 export type EventClient = {
   _id: string;
@@ -69,29 +69,32 @@ const EventDetailsPage = async ({
   params: Promise<{ slug: string }>;
 }) => {
   const { slug } = await params;
-  const res = await fetch(`${BASE_URL}/api/events/${slug}`);
+  const event = await getEventBySlug(slug);
+  const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL;
+
+  if (!event) return notFound();
+
   const {
-    event: {
-      description,
-      image,
-      overview,
-      date,
-      time,
-      location,
-      mode,
-      agenda,
-      organizer,
-      audience,
-      tags,
-    },
-  } = await res.json();
+    description,
+    image,
+    overview,
+    date,
+    time,
+    location,
+    mode,
+    agenda,
+    organizer,
+    audience,
+    tags,
+  } = event;
 
-  if (!description) return notFound();
-
-  const bookings = 10;
+  const res = await fetch(`${BASE_URL}/api/booking?eventId=${event._id}`, {
+    cache: "no-store",
+  });
+  const { data } = await res.json();
+  const bookings = data.count;
 
   const similarEvents: EventClient[] = await getSimilarEventsBySlug(slug);
-  console.log("Similar Events:", similarEvents);
 
   return (
     <section id="event">
@@ -166,24 +169,22 @@ const EventDetailsPage = async ({
             ) : (
               <p className="text-sm">Be the first to book your spot!</p>
             )}
-
-            <BookEvent />
+            <BookEvent eventId={event._id} />
           </div>
         </aside>
       </div>
 
       <div className="flex w-full flex-col gap-4 pt-20">
-                {similarEvents.length > 0 && (
-                  <h2>Similar Events</h2>
-                )}
-                <div className="events">
-                    {similarEvents.length > 0 && similarEvents.map((similarEvent: EventClient) => (
-                        <EventCard key={similarEvent._id} {...similarEvent} />
-                    ))}
-                </div>
-            </div>
+        {similarEvents.length > 0 && <h2>Similar Events</h2>}
+        <div className="events">
+          {similarEvents.length > 0 &&
+            similarEvents.map((similarEvent: EventClient) => (
+              <EventCard key={similarEvent._id} {...similarEvent} />
+            ))}
+        </div>
+      </div>
     </section>
   );
 };
- 
+
 export default EventDetailsPage;

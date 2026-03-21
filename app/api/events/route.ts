@@ -92,7 +92,6 @@ export async function POST(req: NextRequest) {
         return NextResponse.json({ message: "Event created successfully", event: createdEvent }, { status: 201 });
         
     } catch (error) {
-        console.log(error);
         const errorMessage = error instanceof Error ? error.message : "Unknown error";
         let status = 500;
         

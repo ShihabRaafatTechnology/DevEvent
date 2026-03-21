@@ -35,6 +35,7 @@ const BookingSchema = new Schema<IBooking>(
     timestamps: true, // Automatically manage createdAt and updatedAt
   }
 );
+BookingSchema.index({ eventId: 1, email: 1 }, { unique: true });
 
 /**
  * Pre-save hook to verify that the referenced event exists
