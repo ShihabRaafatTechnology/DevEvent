@@ -39,7 +39,7 @@ export async function GET(req: NextRequest) {
     if (eventId !== null) {
       if (!mongoose.Types.ObjectId.isValid(eventId)) {
         return NextResponse.json(
-          { message: "Invalid email format", error: "Invalid 'eventId' format" },
+          { message: "Invalid eventId format", error: "Invalid 'eventId' format" },
           { status: 400 }
         );
       }

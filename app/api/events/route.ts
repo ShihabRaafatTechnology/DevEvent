@@ -26,7 +26,11 @@ export async function POST(req: NextRequest) {
         let agenda: string[];
         try {
             const agendaStr = formData.get('agenda')?.toString();
-            agenda = agendaStr ? JSON.parse(agendaStr) : [];
+            const parsedAgenda = agendaStr ? JSON.parse(agendaStr) : [];
+            if (!Array.isArray(parsedAgenda) || !parsedAgenda.every(item => typeof item === 'string')) {
+                return NextResponse.json({ message: "Invalid agenda JSON" }, { status: 400 });
+            }
+            agenda = parsedAgenda;
         } catch {
             return NextResponse.json({ message: "Invalid agenda JSON" }, { status: 400 });
         }
@@ -34,7 +38,11 @@ export async function POST(req: NextRequest) {
         let tags: string[];
         try {
             const tagsStr = formData.get('tags')?.toString();
-            tags = tagsStr ? JSON.parse(tagsStr) : [];
+            const parsedTags = tagsStr ? JSON.parse(tagsStr) : [];
+            if (!Array.isArray(parsedTags) || !parsedTags.every(item => typeof item === 'string')) {
+                return NextResponse.json({ message: "Invalid tags JSON" }, { status: 400 });
+            }
+            tags = parsedTags;
         } catch {
             return NextResponse.json({ message: "Invalid tags JSON" }, { status: 400 });
         }

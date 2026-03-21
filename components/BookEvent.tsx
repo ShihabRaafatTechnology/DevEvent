@@ -1,56 +1,35 @@
 "use client";
+import { createBooking } from "@/lib/actions/booking.actions";
+import posthog from "posthog-js";
 import { useState } from "react";
 
-const BookEvent = ({ eventId }: { eventId: string }) => {
-  const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL;
-
-
+const BookEvent = ({ eventId, slug }: { eventId: string; slug: string }) => {
   const [email, setEmail] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [message, setMessage] = useState("");
-
+  const [message, setMessage] = useState<{ text: string; type: "success" | "error" } | null>(null);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setIsSubmitting(true);
+    setMessage(null);
 
-    if (!email) return;
+    const { success, error } = await createBooking({ eventId, email, slug });
 
-    try {
-      setIsSubmitting(true);
-      setMessage("");
-
-      const res = await fetch(`${BASE_URL}/api/booking`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          eventId,
-          email,
-        }),
-      });
-
-      const data = await res.json();
-
-      if (!res.ok) {
-        setMessage(data.message || "Something went wrong");
-        setIsSubmitting(false);
-        return;
-      }
-
-      setMessage("✅ Booking successful!");
+    if (success) {
+      setMessage({ text: "Booking confirmed! Check your email.", type: "success" });
       setEmail("");
-    } catch {
-      setMessage("❌ Network error");
-    } finally {
-      setIsSubmitting(false);
+      posthog.capture("booking_created", { eventId, slug, email });
+    } else {
+      setMessage({ text: error || "Booking failed. Please try again.", type: "error" });
+      console.error("Booking creation failed:", error);
+      posthog.captureException(error);
     }
+
+    setIsSubmitting(false);
   };
 
   return (
     <div id="book-event">
-      {message && <p className="text-sm">{message}</p>}
-
       <form onSubmit={handleSubmit}>
         <input
           type="email"
@@ -62,6 +41,11 @@ const BookEvent = ({ eventId }: { eventId: string }) => {
         <button type="submit" disabled={isSubmitting}>
           {isSubmitting ? "Booking..." : "Book Now"}
         </button>
+        {message && (
+          <p className={message.type === "success" ? "text-green-600" : "text-red-600"}>
+            {message.text}
+          </p>
+        )}
       </form>
     </div>
   );

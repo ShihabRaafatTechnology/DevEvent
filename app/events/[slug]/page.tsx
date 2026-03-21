@@ -4,6 +4,7 @@ import {
   getEventBySlug,
   getSimilarEventsBySlug,
 } from "@/lib/actions/event.actions";
+import connectDB from "@/lib/mongodb";
 import Image from "next/image";
 import { notFound } from "next/navigation";
 
@@ -68,6 +69,7 @@ const EventDetailsPage = async ({
 }: {
   params: Promise<{ slug: string }>;
 }) => {
+  await connectDB();
   const { slug } = await params;
   const event = await getEventBySlug(slug);
   const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL;
@@ -88,11 +90,20 @@ const EventDetailsPage = async ({
     tags,
   } = event;
 
-  const res = await fetch(`${BASE_URL}/api/booking?eventId=${event._id}`, {
-    cache: "no-store",
-  });
-  const { data } = await res.json();
-  const bookings = data.count;
+  let bookings = 0;
+  try {
+    const res = await fetch(`${BASE_URL}/api/booking?eventId=${event._id}`, {
+      cache: "no-store",
+    });
+    if (res.ok) {
+      const json = await res.json();
+      if (json?.data && typeof json.data.count === "number") {
+        bookings = json.data.count;
+      }
+    }
+  } catch {
+    // Network or parse error — fall back to 0
+  }
 
   const similarEvents: EventClient[] = await getSimilarEventsBySlug(slug);
 
@@ -106,13 +117,15 @@ const EventDetailsPage = async ({
       <div className="details">
         {/* Left Side - Event Content */}
         <div className="content">
-          <Image
-            src={image}
-            alt="Event Image"
-            width={800}
-            height={800}
-            className="banner"
-          />
+          {image && (
+            <Image
+              src={image}
+              alt="Event Image"
+              width={800}
+              height={800}
+              className="banner"
+            />
+          )}
 
           <section className="flex-col-gap-2">
             <h2>Overview</h2>
@@ -169,7 +182,7 @@ const EventDetailsPage = async ({
             ) : (
               <p className="text-sm">Be the first to book your spot!</p>
             )}
-            <BookEvent eventId={event._id} />
+            <BookEvent eventId={event._id} slug={event.slug}/>
           </div>
         </aside>
       </div>

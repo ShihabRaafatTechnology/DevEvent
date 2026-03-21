@@ -4,6 +4,7 @@ import mongoose, { Document, Model, Schema } from 'mongoose';
 export interface IBooking extends Document {
   eventId: mongoose.Types.ObjectId;
   email: string;
+  slug: string;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -30,12 +31,17 @@ const BookingSchema = new Schema<IBooking>(
         message: 'Invalid email format',
       },
     },
+    slug: {
+      type: String,
+      ref: 'Event',
+      required: [true, 'Event slug is required'],
+    },
   },
   {
     timestamps: true, // Automatically manage createdAt and updatedAt
   }
 );
-BookingSchema.index({ eventId: 1, email: 1 }, { unique: true });
+BookingSchema.index({ eventId: 1, email: 1, slug: 1 }, { unique: true });
 
 /**
  * Pre-save hook to verify that the referenced event exists

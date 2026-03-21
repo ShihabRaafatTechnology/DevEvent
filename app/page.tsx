@@ -11,11 +11,22 @@ const page = async () => {
   if (!BASE_URL) {
     throw new Error("NEXT_PUBLIC_BASE_URL is not set");
   }
-  const res = await fetch(`${BASE_URL}/api/events`);
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), 5000);
+
+  const res = await fetch(`${BASE_URL}/api/events`, { signal: controller.signal }).finally(() =>
+    clearTimeout(timeoutId)
+  );
+
   if (!res.ok) {
     throw new Error(`Failed to fetch events: ${res.status} ${res.statusText}`);
   }
-  const { events } = await res.json();
+
+  const data = await res.json();
+  if (!data.events || !Array.isArray(data.events)) {
+    throw new Error("Invalid response: expected events array");
+  }
+  const events: IEvent[] = data.events;
 
   return (
     <section>
