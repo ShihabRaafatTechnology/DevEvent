@@ -1,36 +1,59 @@
-import ExploreBtn from "@/components/ExploreBtn";
 import EventCard from "@/components/EventCard";
-import {IEvent} from "@/database";
-import {cacheLife} from "next/cache";
+import ExploreBtn from "@/components/ExploreBtn";
+import type { IEvent } from "@/database";
+import { cacheLife } from "next/cache";
+import { events } from "@/lib/constants";
 
 const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL;
 
-const Page = async () => {
-    'use cache';
-    cacheLife('hours')
-    const response = await fetch(`${BASE_URL}/api/events`);
-    const { events } = await response.json();
+const page = async () => {
+  "use cache";
+  cacheLife("hours");
+  /*if (!BASE_URL) {
+    throw new Error("NEXT_PUBLIC_BASE_URL is not set");
+  }
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), 5000);
 
-    return (
-        <section>
-            <h1 className="text-center">The Hub for Every Dev <br /> Event You Can't Miss</h1>
-            <p className="text-center mt-5">Hackathons, Meetups, and Conferences, All in One Place</p>
+ const res = await fetch(`${BASE_URL}/api/events`, { signal: controller.signal }).finally(() =>
+   clearTimeout(timeoutId)
+);
 
-            <ExploreBtn />
-
-            <div className="mt-20 space-y-7">
-                <h3>Featured Events</h3>
-
-                <ul className="events">
-                    {events && events.length > 0 && events.map((event: IEvent) => (
-                        <li key={event.title} className="list-none">
-                            <EventCard {...event} />
-                        </li>
-                    ))}
-                </ul>
-            </div>
-        </section>
-    )
+if (!res.ok) {
+  throw new Error(`Failed to fetch events: ${res.status} ${res.statusText}`);
 }
 
-export default Page;
+const data = await res.json();
+if (!data.events || !Array.isArray(data.events)) {
+  throw new Error("Invalid response: expected events array");
+}
+const events: IEvent[] = data.events;*/
+
+  return (
+    <section>
+      <h1 className="text-center my-5">
+        The Hub for Every Dev <br />
+        Event You Can&apos;t Miss
+      </h1>
+      <p className="text-center text-sm lg:text-base">
+        Hackathons, Meetups, and Conferences, All in One Place
+      </p>
+      <ExploreBtn />
+
+      <div className="mt-20 space-y-7">
+        <h3>Featured Events</h3>
+        <ul className="events">
+          {events &&
+            events.length > 0 &&
+            events.map((event: IEvent) => (
+              <li key={event.slug ?? `event-${event._id}`}>
+                <EventCard {...event} />
+              </li>
+            ))}
+        </ul>
+      </div>
+    </section>
+  );
+};
+
+export default page;
