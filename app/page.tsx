@@ -2,31 +2,32 @@ import EventCard from "@/components/EventCard";
 import ExploreBtn from "@/components/ExploreBtn";
 import type { IEvent } from "@/database";
 import { cacheLife } from "next/cache";
+import { events } from "@/lib/constants";
 
-const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL;
+//const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL;
 
 const page = async () => {
   "use cache";
   cacheLife("hours");
-  if (!BASE_URL) {
+  /*if (!BASE_URL) {
     throw new Error("NEXT_PUBLIC_BASE_URL is not set");
   }
   const controller = new AbortController();
   const timeoutId = setTimeout(() => controller.abort(), 5000);
 
-  const res = await fetch(`${BASE_URL}/api/events`, { signal: controller.signal }).finally(() =>
-    clearTimeout(timeoutId)
-  );
+ const res = await fetch(`${BASE_URL}/api/events`, { signal: controller.signal }).finally(() =>
+   clearTimeout(timeoutId)
+);
 
-  if (!res.ok) {
-    throw new Error(`Failed to fetch events: ${res.status} ${res.statusText}`);
-  }
+if (!res.ok) {
+  throw new Error(`Failed to fetch events: ${res.status} ${res.statusText}`);
+}
 
-  const data = await res.json();
-  if (!data.events || !Array.isArray(data.events)) {
-    throw new Error("Invalid response: expected events array");
-  }
-  const events: IEvent[] = data.events;
+const data = await res.json();
+if (!data.events || !Array.isArray(data.events)) {
+  throw new Error("Invalid response: expected events array");
+}
+const events: IEvent[] = data.events;*/
 
   return (
     <section>
