@@ -2,14 +2,13 @@ import EventCard from "@/components/EventCard";
 import ExploreBtn from "@/components/ExploreBtn";
 import type { IEvent } from "@/database";
 import { cacheLife } from "next/cache";
-import { events } from "@/lib/constants";
 
 const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL;
 
 const page = async () => {
   "use cache";
   cacheLife("hours");
-  /*if (!BASE_URL) {
+  if (!BASE_URL) {
     throw new Error("NEXT_PUBLIC_BASE_URL is not set");
   }
   const controller = new AbortController();
@@ -27,7 +26,7 @@ const data = await res.json();
 if (!data.events || !Array.isArray(data.events)) {
   throw new Error("Invalid response: expected events array");
 }
-const events: IEvent[] = data.events;*/
+const events: IEvent[] = data.events;
 
   return (
     <section>
